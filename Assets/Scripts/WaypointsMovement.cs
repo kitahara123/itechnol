@@ -3,19 +3,24 @@ using UnityEngine;
 
 public class WaypointsMovement : MonoBehaviour
 {
-    [SerializeField] private float speed = 5;
-    [SerializeField] private float rotationSpeed = 0.1f;
-    [SerializeField] private float maxSpeed = 100;
-    [SerializeField] private float minSpeed = 10;
+    [SerializeField] private float speed = 2000;
+
+    [Tooltip("less number = more speed")] [SerializeField]
+    private float rotationSpeedModifier = 200f;
+
+    [SerializeField] private float maxSpeed = 4000;
+    [SerializeField] private float minSpeed = 1000;
     [SerializeField] private float touchOffset = 1f;
     [SerializeField] private float almostThereOffset = 5f;
     [SerializeField] private int strafePointsSkip = 15;
     [SerializeField] private int speedDelta = 5;
+    [SerializeField] private int startPointIndx = 0;
+    [SerializeField] private int startTrackIndx = 0;
 
     private List<Curve> track => TrackManager.Curves;
     private int currentPointIndx = 0;
     private int currentTrackIndx = 0;
-    private Vector3 startPoint => PointByIndex(0);
+    private Vector3 startPoint => PointByIndex(startPointIndx);
     private Vector3 finishPoint => PointByIndex(track[currentTrackIndx].xyzPoints.Length - 1);
     private Vector3 currentPoint => PointByIndex(currentPointIndx);
     private bool isNextPointSkipPoint => indxToSkip >= currentPointIndx;
@@ -23,10 +28,13 @@ public class WaypointsMovement : MonoBehaviour
     private Quaternion initialRotation;
     private Rigidbody rb;
     private int indxToSkip;
+    private bool finished = false;
 
     private void Start()
     {
         transform.position = startPoint;
+        currentPointIndx = startPointIndx;
+        currentTrackIndx = startTrackIndx;
         initialRotation = transform.rotation;
         rb = GetComponent<Rigidbody>();
     }
@@ -34,9 +42,16 @@ public class WaypointsMovement : MonoBehaviour
 
     private void Update()
     {
+        if (finished) return;
         if (currentPoint == finishPoint)
         {
+            finished = true;
             rb.velocity = Vector3.zero;
+            transform.position = finishPoint;
+
+            var player = GetComponent<Player>();
+            if (player != null)
+                Messenger<Player>.Broadcast(GameEvent.PLAYER_FINISHED, player);
             return;
         }
 
@@ -55,7 +70,7 @@ public class WaypointsMovement : MonoBehaviour
         if (Input.GetKeyUp("left") &&
             (!isNextPointSkipPoint ||
              (isNextPointSkipPoint && distanceToNextPoint > almostThereOffset))) StrafeLeft();
-        
+
         if (Input.GetKeyUp("right") &&
             (!isNextPointSkipPoint ||
              (isNextPointSkipPoint && distanceToNextPoint > almostThereOffset))) StrafeRight();
@@ -70,7 +85,8 @@ public class WaypointsMovement : MonoBehaviour
         }
 
         var direction = Quaternion.LookRotation(NextPoint() - transform.position) * initialRotation;
-        transform.rotation = Quaternion.Lerp(transform.rotation, direction, rotationSpeed * Time.deltaTime);
+        transform.rotation =
+            Quaternion.Lerp(transform.rotation, direction, speed / rotationSpeedModifier * Time.deltaTime);
     }
 
     private void StrafeLeft()
@@ -103,6 +119,12 @@ public class WaypointsMovement : MonoBehaviour
         currentPointIndx += shiftBy;
     }
 
-    private Vector3 NextPoint() => PointByIndex(currentPointIndx + 1);
+    private Vector3 NextPoint()
+    {
+        return track[currentTrackIndx].xyzPoints.Length - 1 > currentPointIndx
+            ? PointByIndex(currentPointIndx + 1)
+            : PointByIndex(currentPointIndx);
+    }
+
     private Vector3 PointByIndex(int indx) => track[currentTrackIndx].xyzPoints[indx];
 }

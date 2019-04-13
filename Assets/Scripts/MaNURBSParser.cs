@@ -28,24 +28,25 @@ public static class MaNURBSParser
             var pointsNode = attrNodes.FirstOrDefault(s => s.Contains("nurbsCurve"));
 
             var start = pointsNode.IndexOf("2582\n") + "2582\n".Length;
-            var coordinates = pointsNode.Substring(start, pointsNode.IndexOf(';') - start + 1);
+            var coordinates = pointsNode.Substring(start, pointsNode.IndexOf(';') - start - 3);
 
             var coordinateLines = coordinates.Split('\n');
 
             curve.CreateCoordinateMassives(coordinateLines.Length);
 
-            for (var index = 0; index < coordinateLines.Length - 1; index++)
+            for (var index = 0; index < coordinateLines.Length; index++)
             {
                 var line = coordinateLines[index].Trim();
+
                 var xyz = line.Split(' ');
 
                 var x = float.Parse(xyz[0], CultureInfo.InvariantCulture.NumberFormat);
                 var y = float.Parse(xyz[1], CultureInfo.InvariantCulture.NumberFormat);
                 var z = float.Parse(xyz[2], CultureInfo.InvariantCulture.NumberFormat);
+                
 
                 curve.xyzPoints[index] = new Vector3(x, y, z);
             }
-
             curves.Add(curve);
         }
 
