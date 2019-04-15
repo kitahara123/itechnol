@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ITechnol;
 using UnityEngine;
 
 public class WaypointsMovement : MonoBehaviour
@@ -14,13 +15,11 @@ public class WaypointsMovement : MonoBehaviour
     [SerializeField] private float almostThereOffset = 5f;
     [SerializeField] private int strafePointsSkip = 15;
     [SerializeField] private int speedDelta = 5;
-    [SerializeField] private int startPointIndx = 0;
-    [SerializeField] private int startTrackIndx = 0;
 
     private List<Curve> track => TrackManager.Curves;
     private int currentPointIndx = 0;
     private int currentTrackIndx = 0;
-    private Vector3 startPoint => PointByIndex(startPointIndx);
+
     private Vector3 finishPoint => PointByIndex(track[currentTrackIndx].xyzPoints.Length - 1);
     private Vector3 currentPoint => PointByIndex(currentPointIndx);
     private bool isNextPointSkipPoint => indxToSkip >= currentPointIndx;
@@ -28,34 +27,43 @@ public class WaypointsMovement : MonoBehaviour
     private Quaternion initialRotation;
     private Rigidbody rb;
     private int indxToSkip;
-    private bool finished = false;
+    private bool inRace = false;
 
     private void Start()
     {
-        transform.position = startPoint;
-        currentPointIndx = startPointIndx;
-        currentTrackIndx = startTrackIndx;
         initialRotation = transform.rotation;
         rb = GetComponent<Rigidbody>();
     }
 
+    public GameObject Param(int startTrackIndx, int startPointIndx)
+    {
+        currentTrackIndx = startTrackIndx;
+        currentPointIndx = startPointIndx;
+        return this.gameObject;
+    }
 
     private void Update()
     {
-        if (finished) return;
-        if (currentPoint == finishPoint)
-        {
-            finished = true;
-            rb.velocity = Vector3.zero;
-            transform.position = finishPoint;
+        if (!GameManager.RaceIsActive) return;
+        var inputVert = Input.GetAxis("Vertical");
 
-            var player = GetComponent<Player>();
-            if (player != null)
-                Messenger<Player>.Broadcast(GameEvent.PLAYER_FINISHED, player);
+        if (!inRace)
+        {
+            inRace = inputVert > 0;
             return;
         }
 
-        var inputVert = Input.GetAxis("Vertical");
+        if (currentPoint == finishPoint)
+        {
+            inRace = false;
+            rb.velocity = Vector3.zero;
+            transform.position = finishPoint;
+
+            var player = GetComponent<MyPlayer>();
+            if (player != null)
+                Messenger<MyPlayer>.Broadcast(GameEvent.PLAYER_FINISHED, player);
+            return;
+        }
 
         if (inputVert != 0 && Time.frameCount % 25 == 0)
         {
@@ -127,4 +135,10 @@ public class WaypointsMovement : MonoBehaviour
     }
 
     private Vector3 PointByIndex(int indx) => track[currentTrackIndx].xyzPoints[indx];
+
+    private void OnCollisionEnter(Collision other)
+    {
+        var direction = other.transform.position - transform.position;
+        GetComponent<Rigidbody>().AddForce(-direction * other.gameObject.GetComponent<Rigidbody>().mass);
+    }
 }

@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 882084556821e674198491cb3df77b6d
+  - enabled: 1
+    path: Assets/Scenes/SpaceTrack.unity
+    guid: 0e1df5cf523c8624180251a63e179552
   m_configObjects: {}

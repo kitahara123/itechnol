@@ -22,6 +22,7 @@ public class CameraFollow : MonoBehaviour
 
     private void Update()
     {
+        if (target == null) return;
         var position = target.position - (target.rotation * offset);
         var rotation = target.rotation * initialRotation;
 
