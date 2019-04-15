@@ -2,16 +2,13 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using UnityEngine.UI;
-using WebSocketSharp;
 
 namespace ITechnol
 {
     public class Launcher : MonoBehaviourPunCallbacks
     {
-//        [SerializeField] private byte maxPlayersPerRoom = 2;
-        [SerializeField] private TMP_InputField inputName;
-        [SerializeField] private TMP_InputField roomName;
+        [SerializeField] private TMP_InputField inputNameField;
+        [SerializeField] private TMP_InputField roomNameField;
         [SerializeField] private TMP_InputField roomMaxPpl;
         [SerializeField] private GameObject controlPanel;
         [SerializeField] private TextMeshProUGUI progressLabel;
@@ -19,21 +16,17 @@ namespace ITechnol
         const string playerNamePrefKey = "PlayerName";
         const string roomNamePrefKey = "RoomName";
 
-        private string RoomName;
-        string gameVersion = "1";
+        private string roomName;
+        private string gameVersion = "1";
 
-        void Awake()
-        {
-            PhotonNetwork.AutomaticallySyncScene = true;
-        }
-
+        void Awake() => PhotonNetwork.AutomaticallySyncScene = true;
 
         void Start()
         {
             var defaultName = string.Empty;
 
-            inputName.text = defaultName = PlayerPrefs.GetString(playerNamePrefKey, "Player");
-            RoomName = roomName.text = PlayerPrefs.GetString(roomNamePrefKey, "Room1");
+            inputNameField.text = defaultName = PlayerPrefs.GetString(playerNamePrefKey, "Player");
+            roomName = roomNameField.text = PlayerPrefs.GetString(roomNamePrefKey, "Room1");
 
             PhotonNetwork.NickName = defaultName;
 
@@ -58,14 +51,12 @@ namespace ITechnol
             }
 
             PhotonNetwork.NickName = value;
-
             PlayerPrefs.SetString(playerNamePrefKey, value);
         }
 
         public void SetRoomName(string value)
         {
-            RoomName = value;
-
+            roomName = value;
             PlayerPrefs.SetString(roomNamePrefKey, value);
         }
 
@@ -75,12 +66,10 @@ namespace ITechnol
             controlPanel.SetActive(false);
             if (PhotonNetwork.IsConnected)
             {
-                if (RoomName.IsNullOrEmpty())
+                if (string.IsNullOrEmpty(roomName))
                     PhotonNetwork.JoinRandomRoom();
                 else
-                {
-                    PhotonNetwork.JoinRoom(RoomName);
-                }
+                    PhotonNetwork.JoinRoom(roomName);
             }
             else
             {
@@ -105,7 +94,7 @@ namespace ITechnol
         public override void OnJoinRandomFailed(short returnCode, string message) => CreateRoom();
 
         private void CreateRoom() =>
-            PhotonNetwork.CreateRoom(RoomName, new RoomOptions {MaxPlayers = byte.Parse(roomMaxPpl.text)});
+            PhotonNetwork.CreateRoom(roomName, new RoomOptions {MaxPlayers = byte.Parse(roomMaxPpl.text)});
 
         public override void OnJoinedRoom()
         {

@@ -85,6 +85,7 @@ public class WaypointsMovement : MonoBehaviour
 
         if (distanceToNextPoint > touchOffset)
         {
+            //TODO Переделать на addForce
             rb.velocity = transform.up * -speed * Time.deltaTime;
         }
         else

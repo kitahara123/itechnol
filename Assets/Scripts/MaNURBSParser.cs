@@ -9,6 +9,7 @@ using UnityEngine;
 public static class MaNURBSParser
 {
     //TODO Хоть как то пофиксить этот говнокод
+    // Не успел переписать не хватило времени
     public static List<Curve> Parse(string fileName)
     {
         var curves = new List<Curve>();

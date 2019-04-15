@@ -5,20 +5,12 @@ namespace ITechnol
 {
     public class MyPlayer : MonoBehaviour
     {
-        [SerializeField] private string name;
-
-
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-
+        public string Name { get; set; }
         public float FinishTime { get; set; }
 
         public MyPlayer(string name, float finishTime)
         {
-            this.name = name;
+            Name = name;
             FinishTime = finishTime;
         }
     }
