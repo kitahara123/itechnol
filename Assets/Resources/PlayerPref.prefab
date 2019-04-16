@@ -229,7 +229,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce3958783b47435ca889e3df2e3c07e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Jeka
 --- !u!114 &6496836678194157982
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -86,6 +86,7 @@ namespace ITechnol
 
         public override void OnDisconnected(DisconnectCause cause)
         {
+            Debug.Log("Disconnect");
             progressLabel.gameObject.SetActive(false);
             controlPanel.SetActive(true);
         }
@@ -93,11 +94,15 @@ namespace ITechnol
         public override void OnJoinRoomFailed(short returnCode, string message) => CreateRoom();
         public override void OnJoinRandomFailed(short returnCode, string message) => CreateRoom();
 
-        private void CreateRoom() =>
+        private void CreateRoom()
+        {
+            Debug.Log("Create " + roomName + " " + roomMaxPpl.text);
             PhotonNetwork.CreateRoom(roomName, new RoomOptions {MaxPlayers = byte.Parse(roomMaxPpl.text)});
+        }
 
         public override void OnJoinedRoom()
         {
+            Debug.Log("Joined " + roomName + " " + roomMaxPpl.text);
             if (!PhotonNetwork.IsMasterClient) return;
             PhotonNetwork.LoadLevel(1);
         }

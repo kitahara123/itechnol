@@ -564,7 +564,7 @@ MonoBehaviour:
   primitive: {fileID: 5972409429651668834, guid: 3f854425335fb9a42a53959b80c3a4f4,
     type: 3}
   trackOffset: -5
-  waypointsFileName: Assets/Seg03Waypoints.ma
+  waypointsFileName: Seg03Waypoints.ma
 --- !u!4 &925628358
 Transform:
   m_ObjectHideFlags: 0

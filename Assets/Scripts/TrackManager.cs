@@ -6,7 +6,7 @@ public class TrackManager : MonoBehaviour
     [SerializeField] private GameObject primitive;
     [SerializeField] private float trackOffset = -5f;
 
-    [SerializeField] private string waypointsFileName = "Assets/Seg03Waypoints.ma";
+    [SerializeField] private string waypointsFileName = "Seg03Waypoints.ma";
 
 
     private static List<Curve> curves;
@@ -14,7 +14,7 @@ public class TrackManager : MonoBehaviour
 
     private void Awake()
     {
-        curves = MaNURBSParser.Parse(waypointsFileName);
+        curves = MaNURBSParser.Parse(Application.dataPath + "/StreamingAssets/" + waypointsFileName);
         foreach (var curve in curves)
         {
             int i = 0;
